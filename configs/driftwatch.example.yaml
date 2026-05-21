@@ -1,0 +1,37 @@
+# driftwatch configuration example
+# Copy this file to driftwatch.yaml and fill in your values.
+
+terraform:
+  # Path to the Terraform state file (local backend) or a remote state identifier.
+  state_path: ./terraform.tfstate
+  # Terraform workspace name (default: "default")
+  workspace: default
+  # Backend type: local | s3 | gcs
+  backend_type: local
+
+slack:
+  enabled: false
+  # Incoming Webhook URL from your Slack app configuration.
+  webhook_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+  # Slack channel to post drift alerts to.
+  channel: "#infrastructure-alerts"
+
+pagerduty:
+  enabled: false
+  # PagerDuty Events API v2 integration key.
+  integration_key: "YOUR_PAGERDUTY_INTEGRATION_KEY"
+  # Alert severity: critical | error | warning | info
+  severity: warning
+
+scan:
+  # How often to scan for drift (e.g. 5m, 1h).
+  interval: 5m
+  # Limit scanning to specific Terraform resource types.
+  # Leave empty to scan all resource types found in state.
+  resource_types:
+    - aws_instance
+    - aws_security_group
+    - aws_s3_bucket
+  # Resource addresses to ignore during drift detection.
+  ignore_resources:
+    - aws_instance.bastion
