@@ -92,3 +92,28 @@ func TestFetchIAMRole_NoDescription(t *testing.T) {
 		t.Error("description should be absent when not set")
 	}
 }
+
+// TestFetchIAMRole_ARNAndPath verifies that the arn and path attributes are
+// correctly populated from the API response.
+func TestFetchIAMRole_ARNAndPath(t *testing.T) {
+	client := &mockIAMClient{
+		out: &iam.GetRoleOutput{
+			Role: &types.Role{
+				RoleName: aws.String("path-role"),
+				Arn:      aws.String("arn:aws:iam::123456789012:role/eng/path-role"),
+				Path:     aws.String("/eng/"),
+			},
+		},
+	}
+
+	attrs, err := fetchIAMRole(context.Background(), client, "path-role")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if attrs["arn"] != "arn:aws:iam::123456789012:role/eng/path-role" {
+		t.Errorf("expected arn=arn:aws:iam::123456789012:role/eng/path-role, got %q", attrs["arn"])
+	}
+	if attrs["path"] != "/eng/" {
+		t.Errorf("expected path=/eng/, got %q", attrs["path"])
+	}
+}
